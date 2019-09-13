@@ -1,6 +1,5 @@
 package com.trade.autumnboot.endpoints;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -53,14 +52,13 @@ public class MockDataEndpoint {
 		// TODO
 		// Call the FileUtils and store
 		String mockFileStoreName = fileUtils.store(mockDataRequest.getTicker(),
-				mockDataRequest.getStartDate().toString(), mockDataRequest.getStartDate().toString(),
+				mockDataRequest.getStartDate().toString(), mockDataRequest.getStartDate().plusDays(mockDataRequest.getNumOfDays()).toString(),
 				mockDataRequest.getGeneratorType(), mockdata, true);
 		logger.info("-- wrote mockdata to "+mockFileStoreName);
 		return mockdata;
 	}
 
-	@GetMapping
-	@RequestMapping("/generator/meta")
+	@GetMapping(path = "/generator/meta")
 	public HashMap<String, String> getMockGeneratorMetaData(){
 		return mockGeneratorMetaData;
 	}

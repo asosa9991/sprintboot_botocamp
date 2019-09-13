@@ -4,11 +4,17 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.trade.autumnboot.domain.quotes.Summary;
+
+import io.swagger.annotations.ApiModel;
+
 @Component
+@ApiModel
 public class FileListResponse {
 	
 	private List<String> fileList;
-	private int fileCount;
+	private List<String> downloadList;
+	private Summary summary;
 	
 	public List<String> getFileList() {
 		return fileList;
@@ -16,11 +22,18 @@ public class FileListResponse {
 	public void setFileList(List<String> fileList) {
 		this.fileList = fileList;
 	}
-	public int getFileCount() {
-		return fileCount;
+	public Summary getSummary() {
+		return summary;
 	}
-	public void setFileCount(int fileCount) {
-		this.fileCount = fileCount;
+	
+	public void setSummary(Summary summary) {
+		this.summary = summary;
+	}
+	public List<String> getDownloadList() {
+		return downloadList;
+	}
+	public void setDownloadList(List<String> downloadList) {
+		this.downloadList = downloadList;
 	}
 	
 	

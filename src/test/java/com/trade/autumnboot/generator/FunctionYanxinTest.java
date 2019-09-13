@@ -21,5 +21,5 @@ public class FunctionYanxinTest {
 			assertThat(md.getHighPrice()).isGreaterThan(md.getLowPrice());
 		});
 	}
-
 }
+

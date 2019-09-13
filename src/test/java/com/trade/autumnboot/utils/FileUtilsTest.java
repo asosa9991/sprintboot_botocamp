@@ -43,16 +43,18 @@ public class FileUtilsTest {
 		assertThat(files).isNotNull();
 		assertThat(files.size()).isGreaterThan(0);
 		}
+	
+	@Test
 	public void test_DeleteFile() {
 		
 		List<MockData> mockDataList= new ArrayList<>();
 		MockData data = new MockData();
 		data.setOnDate(LocalDate.now());
 		mockDataList.add(data);
-		String fileName = fileUtils.store("AAPL", "START-DATE", "END-DATE", "GENERATOR-TYPE", mockDataList, false);
-		assertThat(fileName).isEqualTo("src/main/resources/data/"+"AAPL_START-DATE_END-DATE_GENERATOR-TYPE.json");
+		String fileName = fileUtils.store("AAPL", "START-DATE", "END-DATE", "GENERATOR-TYPE-DELETE-TEST", mockDataList, false);
+		assertThat(fileName).isEqualTo("src/main/resources/data/"+"AAPL_START-DATE_END-DATE_GENERATOR-TYPE-DELETE-TEST.json");
 		
-		fileName = "AAPL_START-DATE_END-DATE_GENERATOR-TYPE.json";
+		fileName = "AAPL_START-DATE_END-DATE_GENERATOR-TYPE-DELETE-TEST.json";
 		String status = fileUtils.delete(fileName);
 		assertThat(status).isEqualTo("DELETED");
 	}

@@ -2,19 +2,15 @@ package com.trade.autumnboot.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,12 +21,10 @@ import com.trade.autumnboot.dto.MockData;
 public class FileUtils {
 
 	private static final String BASE_PATH = "src/main/resources/data/";
-	private static final String FILES_TO_RETRIEVE = "classpath:data/*.json";
-	@Autowired
-	ObjectMapper objectMapper;
+	private static final String DOWNLOAD_ENDPOINT = "http://localhost:8080/download/data/";
 
 	@Autowired
-	private ApplicationContext applicationContext;
+	ObjectMapper objectMapper;
 
 	public String store(String ticker, String startDate, String endDate, String generatorType,
 			List<MockData> mockDataList, boolean appendTimeStamp) {
@@ -53,22 +47,22 @@ public class FileUtils {
 	public List<String> list() {
 		List<String> fileList = new ArrayList<>();
 		try {
-			Resource[] resourceList = applicationContext.getResources(FILES_TO_RETRIEVE);
-			fileList = Arrays.stream(resourceList).map(resource -> {
-				return resource.getFilename();
+			File folder = new File(BASE_PATH);
+			File[] listOfFiles = folder.listFiles();
+			fileList = Arrays.stream(listOfFiles).map(file -> {
+				return file.getName();
 			}).collect(Collectors.toList());
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return fileList;
 	}
 
 	public String delete(String fileName) {
-
 		String status = "FILE NOT FOUND";
 
 		try {
-			Files.delete((Paths.get(("src/main/resources/data/" + fileName))));
+			Files.delete((Paths.get((BASE_PATH + fileName))));
 			System.out.println("Deletion successful.");
 			status = "DELETED";
 			return status;
@@ -79,5 +73,24 @@ public class FileUtils {
 			System.out.println("Invalid permissions.");
 			return status;
 		}
+	}
+
+	public List<String> downloadFiles(List<String> filteredFileList) {
+		List<String> downloadList = filteredFileList.stream().map(filename -> {
+			return DOWNLOAD_ENDPOINT + filename;
+		}).collect(Collectors.toList());
+		return downloadList;
+	}
+
+	public List<String> filterFiles(String ticker, String generatorType, List<String> allFilesList) {
+		List<String> filteredFileList = allFilesList.stream().filter(fileName -> {
+			String[] tokenArray = fileName.split("[_\\.]");
+			List<String> tokenList = Arrays.asList(tokenArray);
+			return (ticker == null
+					|| tokenList.contains(ticker) && (generatorType == null || tokenList.stream().anyMatch(tokenStr -> {
+						return tokenStr.equalsIgnoreCase(generatorType);
+					})));
+		}).collect(Collectors.toList());
+		return filteredFileList;
 	}
 }

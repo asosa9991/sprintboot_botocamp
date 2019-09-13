@@ -1,7 +1,6 @@
 package com.trade.autumnboot.endpoints;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.trade.autumnboot.domain.quotes.Summary;
 import com.trade.autumnboot.dto.FileListResponse;
 import com.trade.autumnboot.utils.FileUtils;
 
 @RestController
 @RequestMapping("/datafiles")
 public class FileDataEndpoint {
+
 	@Autowired
 	private FileUtils fileUtils;
 
@@ -26,15 +27,25 @@ public class FileDataEndpoint {
 	private FileListResponse fileListResponse;
 
 	@GetMapping
-	public FileListResponse dataFiles(@RequestParam(required = false) Map<String, String> searchAttributes) {
+	public FileListResponse dataFiles(@RequestParam(name = "ticker", required = false) String ticker,
+			@RequestParam(name = "generatorType", required = false) String generatorType) {
 
-		fileListResponse.setFileList(fileUtils.list());
-		fileListResponse.setFileCount(fileListResponse.getFileList().size());
+		List<String> allFilesList = fileUtils.list();
+		Summary summary = new Summary();
+
+		List<String> filteredFileList = fileUtils.filterFiles(ticker, generatorType, allFilesList);
+		fileListResponse.setFileList(filteredFileList);
+
+		List<String> downloadList = fileUtils.downloadFiles(filteredFileList);
+		fileListResponse.setDownloadList(downloadList);
+
+//		Summary fileSummary = summary.getSummary(filteredFileList.size(), allFilesList);
+//		fileListResponse.setSummary(fileSummary);
 
 		return fileListResponse;
 	}
 
-	@DeleteMapping("/{filename}")
+	@DeleteMapping("/{filename:.+}")
 	public void deleteFile(@PathVariable("filename") String fileName) {
 		String fileStatus = fileUtils.delete(fileName);
 		if (fileStatus.equals("FILE NOT FOUND")) {
