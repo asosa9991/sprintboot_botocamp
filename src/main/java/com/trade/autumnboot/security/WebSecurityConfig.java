@@ -6,31 +6,29 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-            .authorizeRequests()
-                .anyRequest().permitAll()
-                .and()
-            .httpBasic()
-                .and()
-            .csrf().disable()
-            .headers().frameOptions().disable();
+    	http
+        //HTTP Basic authentication
+        .httpBasic()
+        .and()
+        .authorizeRequests()
+        .antMatchers("/mockdata/**").hasRole("ADMIN")
+        .and()
+        .csrf().disable()
+        .formLogin().disable();
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
             .inMemoryAuthentication()
-                .withUser("john").password("smith").roles("USER")
+                .withUser("john").password("{noop}smith").roles("USER")
                 .and()
-                .withUser("admin").password("admin").roles("USER", "ADMIN");
+                .withUser("admin").password("{noop}admin").roles("USER", "ADMIN");
     }
 }

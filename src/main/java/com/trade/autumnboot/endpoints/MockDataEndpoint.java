@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,8 +21,13 @@ import com.trade.autumnboot.generator.MockGenerator;
 import com.trade.autumnboot.generator.MockGeneratorFactory;
 import com.trade.autumnboot.utils.FileUtils;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+
 @RestController
 @RequestMapping("/mockdata")
+@Api(tags = "MockQuote")
 public class MockDataEndpoint {
 
 	@Autowired
@@ -59,6 +65,7 @@ public class MockDataEndpoint {
 	}
 
 	@GetMapping(path = "/generator/meta")
+	@ApiOperation(value = "Return list of mock quotes generator metadata", authorizations = {@Authorization(value = "basicAuth")})
 	public HashMap<String, String> getMockGeneratorMetaData(){
 		return mockGeneratorMetaData;
 	}
